@@ -40,17 +40,21 @@ app.post("/api/shorturl", (req, res) => {
       return res.json({ error: "Dominio no encontrado" });
     }
 
-    // Generar un identificador único de 6 caracteres
-    const shortId = crypto.randomBytes(3).toString("hex");
+    if (url.protocol != "https:") {
+      res.json({ error: "invalid url" });
+    } else {
+      // Generar un identificador único de 6 caracteres
+      const shortId = crypto.randomBytes(3).toString("hex");
 
-    // Guardar la URL original en la base de datos usando el identificador corto
-    urlDatabase[shortId] = originalUrl;
+      // Guardar la URL original en la base de datos usando el identificador corto
+      urlDatabase[shortId] = originalUrl;
 
-    // Enviar una respuesta con la URL acortada
-    res.json({
-      original_url: originalUrl,
-      short_url: `/api/shorturl/${shortId}`,
-    });
+      // Enviar una respuesta con la URL acortada
+      res.json({
+        original_url: originalUrl,
+        short_url: `/api/shorturl/${shortId}`,
+      });
+    }
   });
 });
 
