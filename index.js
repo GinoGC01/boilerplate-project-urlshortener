@@ -26,12 +26,13 @@ app.get("/", function (req, res) {
 //(recibe datos desde el formulario)
 app.post("/api/shorturl", (req, res) => {
   const originalUrl = req.body.url;
+  const urlRegex = /^(https?:\/\/)(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\S*)?$/;
 
   let url;
   try {
     url = new URL(originalUrl);
   } catch (error) {
-    return res.json({ error: "URL inválida" });
+    return res.json({ error: "invalid url" });
   }
 
   // Verificar si el dominio es accesible
@@ -40,7 +41,7 @@ app.post("/api/shorturl", (req, res) => {
       return res.json({ error: "Dominio no encontrado" });
     }
 
-    if (url.protocol != "https:") {
+    if (!urlRegex.test(url)) {
       res.json({ error: "invalid url" });
     } else {
       // Generar un identificador único de 6 caracteres
@@ -52,7 +53,7 @@ app.post("/api/shorturl", (req, res) => {
       // Enviar una respuesta con la URL acortada
       res.json({
         original_url: originalUrl,
-        short_url: `/api/shorturl/${shortId}`,
+        short_url: shortId,
       });
     }
   });
@@ -66,7 +67,7 @@ app.get("/api/shorturl/:shortId", (req, res) => {
   if (originalUrl) {
     res.redirect(originalUrl); // Redirige a la URL original
   } else {
-    res.status(404).send("URL no encontrada");
+    res.status(404).send("URL is not found");
   }
 });
 
